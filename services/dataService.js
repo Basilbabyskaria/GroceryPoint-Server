@@ -1,5 +1,24 @@
-const db=require('./db');
-const addProducts=()=>{
+const db=require('./db')
+const getProducts=()=>{
+    return db.Product.find().then(
+        (result)=>{
+            if (result) {
+                return{
+                    status:true,
+                    statusCode:200,
+                    products:result
+                }
+            }else{
+                return{
+                    status:false,
+                    statusCode:404,
+                    message:"no products found"
+                }
+            }
+        }
+    )
+}
+const addProduct=(title,category,description,cost,Sprice,quantity,expiry,profit)=>{
     return db.Product.findOne({title}).then(
         (result)=>{
             if (result) {
@@ -9,7 +28,7 @@ const addProducts=()=>{
                     message:"product allready exists"
                 }
             }else{
-                const newProduct=new db.Product({id,title,price,description,category,image})
+                const newProduct=new db.Product({title,category,description,cost,Sprice,quantity,expiry,profit})
                 newProduct.save()
                 return{
                     status:true,
@@ -20,24 +39,9 @@ const addProducts=()=>{
         }
     )
 }
-const removeProduct=()=>{
-    return db.Product.deleteOne({title}).then(
-        (result)=>{
-            if (result) {
-                return{
-                    status:true,
-                    statusCode:200,
-                    message:"product removed succesfully"
-                }
-            }else{
-                return{
-                    status:false,
-                    statusCode:404,
-                    message:"product does not exist"
-                }
-            }
-        }
-    )
+const deleteproduct=(title)=>{
+    console.log(title);
+    db.Product.deleteOne({title})
 }
 // -----------------------------customer--------------------------
 
@@ -83,27 +87,11 @@ const addCustomer=()=>{
 // }
 
 
-const getProducts=()=>{
-    return db.Product.find().then(
-        (result)=>{
-            if (result) {
-                return{
-                    status:true,
-                    statusCode:200,
-                    Product:result
-                }
-            }else{
-                return{
-                    status:false,
-                    statusCode:404,
-                    message:"no products found"
-                }
-            }
-        }
-    )
-}
+
 
 
 module.exports={
-    getProducts
+    getProducts,
+    addProduct,
+    deleteproduct
 }
