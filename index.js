@@ -35,3 +35,16 @@ app.delete('/deleteproduct/:title',(req,res)=>{
     dataService.deleteproduct(req.params.title)
     
 })
+app.get('/getorders',(req,res)=>{
+    dataService.getorders()
+    .then((result)=>{
+        res.status(result.statusCode).json(result)
+    })
+    
+})
+app.get('/getsummary',(req,res)=>{
+    dataService.getsummary()
+    .then((result)=>{
+        res.status(result.statusCode).json(result)
+    })
+})

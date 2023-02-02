@@ -43,55 +43,55 @@ const deleteproduct=(title)=>{
     console.log(title);
     db.Product.deleteOne({title})
 }
-// -----------------------------customer--------------------------
-
-const addCustomer=()=>{
-    return db.Customer.findOne({name}).then(
+// -----------------------------orders--------------------------
+const getorders=()=>{
+    return db.Order.find().then(
         (result)=>{
             if (result) {
                 return{
-                    status:false,
-                    statusCode:404,
-                    message:"customer allready exists"
-                }
-            }else{
-                const newCustomer=new db.Customer({id,fname,lname,phoneno,address,email})
-                newCustomer.save()
-                return{
                     status:true,
                     statusCode:200,
-                    message:"Customer added succesfully"
+                    orders:result
+                    
+                }
+            }else{
+                return{
+                    status:false,
+                    statusCode:404,
+                    message:"no order found"
                 }
             }
         }
     )
 }
-// const removeCustomer=()=>{
-//     return db.Product.deleteOne({title}).then(
-//         (result)=>{
-//             if (result) {
-//                 return{
-//                     status:true,
-//                     statusCode:200,
-//                     message:"product removed succesfully"
-//                 }
-//             }else{
-//                 return{
-//                     status:false,
-//                     statusCode:404,
-//                     message:"product does not exist"
-//                 }
-//             }
-//         }
-//     )
-// }
 
 
+//----------------dashboard--------------------------------
+const getsummary=()=>{
+    orders=0;
+    earning=0;
+    return db.Order.find().then(
+        (result)=>{
+            if (result) {
+                var today = new Date();
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+                for(let i in result)
+                {
+                    if((i.date).slice(5,7)==mm){
+                        orders+=1;
+                        earning+=i.profit;
+                    }
+                }
+            }
+        }
 
-
+    )
+}
 
 module.exports={
     getProducts,
     addProduct,
-    deleteproduct
+    deleteproduct,
+    getorders,
+    getsummary
 }
