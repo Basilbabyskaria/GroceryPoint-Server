@@ -18,10 +18,13 @@ const Product=mongoose.model('Product',{
 const Order=mongoose.model('Order',{
     id:Number,
     date:Date,
+    items:Object,
     customer_name:String,
-    grand_total:Number
+    grand_total:Number,
+    profit:Number
 })
+
 module.exports={
     Product,
-    Order
+    Order,
 }
