@@ -11,7 +11,13 @@ app.use(cors({
     origin:'http://localhost:4200'
 
 }))
-
+app.get('/getalerlt_expiry',(req,res)=>{
+    dataService.getalerlt_expiry()
+    .then((result)=>{
+        res.status(result.statusCode).json(result)
+    })
+    
+})
 app.get('/getproducts',(req,res)=>{
     dataService.getProducts()
     .then((result)=>{
@@ -64,6 +70,12 @@ app.get('/getsummary',(req,res)=>{
 })
 app.get('/graph_data',(req,res)=>{
     dataService.graph_data()
+    .then((result)=>{
+        res.status(result.statusCode).json(result)
+    })
+})
+app.get('/catagory_graph_data',(req,res)=>{
+    dataService.catagory_graph_data()
     .then((result)=>{
         res.status(result.statusCode).json(result)
     })

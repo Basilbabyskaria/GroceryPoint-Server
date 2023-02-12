@@ -1,5 +1,33 @@
 const { json } = require('express')
 const db=require('./db')
+const getalerlt_expiry=()=>{
+    return db.Product.find().then(
+        (result)=>{
+            if (result) {
+                var today = new Date();
+                var year = today.getFullYear();
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+               
+
+                alerlt_expiry=[];
+                for(let i in result)
+                {   
+                    var x = String(result[i].expiry.getMonth() + 1).padStart(2, '0');
+                    var y = result[i].expiry.getFullYear();
+                    if (x == (mm-1)&year==y) {
+                        alerlt_expiry.push(result[i].title)
+                    }
+                }   
+                // console.log(alerlt_expiry);
+                return{
+                    status:true,
+                    statusCode:200,
+                    result:alerlt_expiry
+                }
+            }
+        }
+    )
+}
 const getProducts=()=>{
     return db.Product.find().then(
         (result)=>{
@@ -53,7 +81,7 @@ const editProduct=(title,category,description,cost,Sprice,quantity,expiry,profit
     }).then(
         (result)=>{
             if (result) {
-                console.log(result);
+                // console.log(result);
                 
                 return{
                     status:true,
@@ -72,7 +100,7 @@ const editProduct=(title,category,description,cost,Sprice,quantity,expiry,profit
     )
 }
 const deleteproduct=(title)=>{
-    console.log(title);
+    // console.log(title);
     return db.Product.deleteOne({title}).then(
         (result)=>{
             if(result){
@@ -119,22 +147,24 @@ const getorders=()=>{
 const getsummary=()=>{
     orders=0;
     earning=0;
+    avg_sales=0;
     total_sales=0;
     Cnames=[];
+    Rname=[];
     repeted_customers=0;
+    returning_customers=0;
     return db.Order.find().then(
         (result)=>{
             if (result) {
                 var today = new Date();
                 var mm = String(today.getMonth() + 1).padStart(2, '0');
-                total_customers=result.length;
+                var year = today.getFullYear();
                 for(let i in result)
                 {   
                     
                     var x = String(result[i].date.getMonth() + 1).padStart(2, '0');
-                    
-                   
-                    if(x == mm){
+                    var y = result[i].date.getFullYear();
+                    if(x == mm & year==y){
                         orders+=1;
                         earning+=result[i].profit;
                         total_sales+=result[i].grand_total;
@@ -142,22 +172,33 @@ const getsummary=()=>{
                         
                     
                     }
-                    avg_sales=total_sales/orders;
+                    avg_sales= parseInt(total_sales/orders);
                     // console.log(total_sales);
-                    console.log(result[i].customer_name);
-                    if(!((result[i].customer_name) in Cnames)){
-                        Cnames.push(result[i].customer_name)
-                        console.log('hi');
-                        console.log(Cnames);
-
-                    }
-                    else{
-                        repeted_customers+=1;
-                        console.log(Cnames);
-
-                    }
+                    // console.log(result[i].customer_name);
                     
-                    returning_customers=parseInt((repeted_customers*100)/total_customers);
+                    if( (Cnames.includes(result[i].customer_name))&(!(Rname.includes(result[i].customer_name)))){
+                        repeted_customers+=1;
+                        Rname.push(result[i].customer_name);
+
+                        // console.log('hi');
+
+                    }
+                    else if((Cnames.includes(result[i].customer_name))&((Rname.includes(result[i].customer_name)))){
+
+                    }
+                    else {
+                        
+                        Cnames.push(result[i].customer_name)
+                        console.log(Cnames);
+                        
+
+                    }
+                    console.log(repeted_customers);
+                    total_customers=Cnames.length;
+                    console.log(total_customers);
+                    returning_customers=parseInt((repeted_customers/total_customers)*100);
+
+                   
                 }
                 dd={
                     "orders":orders,
@@ -165,6 +206,7 @@ const getsummary=()=>{
                     "avg_sales":avg_sales,
                     "returning_customers":returning_customers
                 }
+                // console.log(returning_customers);
                 return{
                     status:true,
                     statusCode:200,
@@ -181,6 +223,8 @@ const graph_data=()=>{
     return db.Order.find().then(
         (result)=>{
             if (result) {
+
+                //bar graph
                 for(let i in result)
                 {   
                  var x = String(result[i].date.getMonth() + 1).padStart(2, '0');
@@ -220,7 +264,9 @@ const graph_data=()=>{
                  else{
                     Dec+=1;
                  }
+
                 }
+
                 sales_per_month={
                     'Jan':Jan,
                     'Feb':Feb,
@@ -233,7 +279,9 @@ const graph_data=()=>{
                     'Sep':Sep,
                     'Oct':Oct,
                     'Nov':Nov,
-                    'Dec':Dec
+                    'Dec':Dec,
+                    
+                    
                 }
                 return{
                     status:true,
@@ -245,14 +293,67 @@ const graph_data=()=>{
         }
     )
 }
+const catagory_graph_data=()=>{
+    var DS=0, Cosmetics=0, Dairy=0, School=0,Other=0,Grocery=0
+    return db.Product.find().then(
+        (result)=>{
+            if (result) {
 
+                //bar graph
+                for(let i in result)
+                {   
+                
+
+                 if (result[i].category=="Grocery") {
+                    Grocery+=1;
+                 }
+                 else if(result[i].category=="Dairy"){
+                    Dairy+=1;
+                 }
+                 else if(result[i].category=="School"){
+                    School+=1;
+                 }
+                 else if(result[i].category=="Drinks/Snacks"){
+                    DS+=1;
+                 }
+                 else if(result[i].category=="Cosmetics"){
+                    Cosmetics+=1;
+                 }
+                 else{
+                    Other+=1;
+                 }
+
+                }
+
+                catagory_count={
+                    
+                    'DS':DS, 
+                    'Cosmetics':Cosmetics, 
+                    'Dairy':Dairy, 
+                    'School':School,
+                    'Other':Other,
+                    'Grocery':Grocery
+                    
+                }
+                return{
+                    status:true,
+                    statusCode:200,
+                    data:catagory_count
+                    
+                }
+            }
+        }
+    )
+}
 module.exports={
     getProducts,
+    getalerlt_expiry,
     addProduct,
     editProduct,
     deleteproduct,
     getorders,
     getsummary,
-    graph_data
+    graph_data,
+    catagory_graph_data
 }
 
