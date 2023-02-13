@@ -295,7 +295,7 @@ const graph_data=()=>{
 }
 const catagory_graph_data=()=>{
     var DS=0, Cosmetics=0, Dairy=0, School=0,Other=0,Grocery=0
-    return db.Product.find().then(
+    return db.Order.find().then(
         (result)=>{
             if (result) {
 
@@ -303,20 +303,22 @@ const catagory_graph_data=()=>{
                 for(let i in result)
                 {   
                 
+                for(let j in result[i].items){
 
-                 if (result[i].category=="Grocery") {
+                
+                 if (result[i].items[j].category=="Grocery") {
                     Grocery+=1;
                  }
-                 else if(result[i].category=="Dairy"){
+                 else if(result[i].items[j].category=="Dairy"){
                     Dairy+=1;
                  }
-                 else if(result[i].category=="School"){
+                 else if(result[i].items[j].category=="School"){
                     School+=1;
                  }
-                 else if(result[i].category=="Drinks/Snacks"){
+                 else if(result[i].items[j].category=="Drinks/Snacks"){
                     DS+=1;
                  }
-                 else if(result[i].category=="Cosmetics"){
+                 else if(result[i].items[j].category=="Cosmetics"){
                     Cosmetics+=1;
                  }
                  else{
@@ -324,7 +326,7 @@ const catagory_graph_data=()=>{
                  }
 
                 }
-
+            }
                 catagory_count={
                     
                     'DS':DS, 
